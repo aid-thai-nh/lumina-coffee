@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "EB Garamond", serif;
+  --font-sans: "Manrope", sans-serif;
+
+  /* Responsive Breakpoints as per specification */
+  --breakpoint-xs: 540px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+
+  --color-lumina-surface: #fcf9f8;
+  --color-lumina-cream: #f9f6f0;
+  --color-lumina-espresso: #2c1810;
+  --color-lumina-deep: #38220f;
+  --color-lumina-caramel: #c68e58;
+  --color-lumina-primary: #835423;
+  --color-lumina-orange: #d36b00;
+  --color-lumina-tertiary: #ea7c1b;
+  --color-lumina-border: #e8dfd1;
+}
+
+/* Base Global Container Standardized to 1440px */
+.lumina-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* @media (min-width: 540px) and (max-width: 575px) */
+@media (min-width: 540px) and (max-width: 575px) {
+  .lumina-container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+/* @media (min-width: 576px) and (max-width: 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .lumina-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* @media (min-width: 768px) and (max-width: 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lumina-container {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+}
+
+/* @media (min-width: 1024px) and (max-width: 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .lumina-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* @media (min-width: 1280px) and (max-width: 1439px) */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .lumina-container {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem;
+  }
+}
+
+/* @media (min-width: 1440px) and (max-width: 1500px) */
+@media (min-width: 1440px) and (max-width: 1500px) {
+  .lumina-container {
+    max-width: 1440px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* @media (max-width: 575px) Mobile Safety */
+@media (max-width: 575px) {
+  .mobile-hide {
+    display: none !important;
+  }
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background-color: #fcf9f8;
+  color: #1c1b1b;
+}
+
+.font-serif-title {
+  font-family: "EB Garamond", serif;
+}
+
+.font-sans-body {
+  font-family: "Manrope", sans-serif;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0eded;
+}
+::-webkit-scrollbar-thumb {
+  background: #d5c3b6;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #837469;
+}

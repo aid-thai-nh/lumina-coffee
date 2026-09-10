@@ -1,0 +1,6 @@
+{
+  "name": "Lumina Coffee",
+  "description": "Thương hiệu cà phê đặc sản thủ công Cầu Đất — Đánh thức ngày mới bằng hương vị nguyên bản, nghệ thuật rang mộc và hệ thống thiết kế tinh tế.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

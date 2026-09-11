@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ViewTab, UserProfile } from '../types';
 import { ShoppingBag, Menu, X, Sparkles, MapPin, Coffee, BookOpen, User, Bike, ChevronDown } from 'lucide-react';
 import { Tooltip } from 'antd';
+import { useI18n } from '../core/i18n/I18nContext';
+import { LanguageSwitcher } from '../core/i18n/LanguageSwitcher';
 
 interface HeaderProps {
   currentTab: ViewTab;
@@ -25,12 +27,13 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfile,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   const navItems: { id: ViewTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { id: 'home', label: 'Trang chủ', icon: <Coffee className="w-4 h-4" /> },
-    { id: 'menu', label: 'Thực đơn đặc sản', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'about', label: 'Câu chuyện di sản', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'locations', label: 'Không gian & Quán', icon: <MapPin className="w-4 h-4" /> },
+    { id: 'home', label: t('nav.home'), icon: <Coffee className="w-4 h-4" /> },
+    { id: 'menu', label: t('nav.menu'), icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'about', label: t('nav.about'), icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'locations', label: t('nav.locations'), icon: <MapPin className="w-4 h-4" /> },
   ];
 
   const handleNavClick = (tab: ViewTab) => {
@@ -88,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Desktop Navigation (Visible from lg: 1024px to 1440px+) */}
         <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navItems.map((item) => {
-            const isActive = currentTab === item.id;
+            const isActive = currentTab === item.id || (currentTab === 'product-detail' && item.id === 'menu');
             return (
               <button
                 key={item.id}
@@ -115,6 +118,11 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Actions */}
         <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+          {/* Language Switcher Dropdown */}
+          <div className="hidden min-[480px]:block">
+            <LanguageSwitcher variant="dropdown" dropdownPlacement="bottom-right" />
+          </div>
+
           {/* Quick Delivery Action Button */}
           <button
             onClick={onOpenQuickDelivery}
@@ -191,7 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
               key={item.id}
               onClick={() => handleNavClick(item.id)}
               className={`flex items-center justify-between py-2 text-left font-medium text-base ${
-                currentTab === item.id
+                currentTab === item.id || (currentTab === 'product-detail' && item.id === 'menu')
                   ? 'text-[#d36b00] font-bold border-l-4 border-[#d36b00] pl-3'
                   : 'text-[#51443a]'
               }`}
@@ -209,6 +217,11 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
 
           <div className="pt-2 border-t border-[#e8dfd1] flex flex-col gap-2">
+            <div className="flex items-center justify-between py-1 px-1">
+              <span className="text-xs font-semibold text-[#51443a]">Ngôn ngữ / Language</span>
+              <LanguageSwitcher variant="dropdown" dropdownPlacement="bottom-left" />
+            </div>
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

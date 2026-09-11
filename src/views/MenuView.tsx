@@ -4,6 +4,12 @@ import { Select, Pagination, Empty, Rate } from 'antd';
 import { Product } from '../types';
 import { PRODUCTS } from '../data/coffeeData';
 import {
+  ProductCardSkeleton,
+  ProductSkeletonGrid,
+  ProductEmptyState,
+} from '../core/components';
+import { useToast } from '../core/hooks/useNotification';
+import {
   Search,
   Star,
   Plus,
@@ -19,7 +25,7 @@ import {
   Flame,
   MapPin,
   Award,
-  CircleDollarSign
+  CircleDollarSign,
 } from 'lucide-react';
 
 interface MenuViewProps {
@@ -47,6 +53,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 6;
   const gridTopRef = useRef<HTMLDivElement>(null);
+  const [isLoading] = useState<boolean>(false);
 
   // Filter definitions (100% Vietnamese)
   const categories = [
@@ -233,7 +240,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-2xl mx-auto mb-10"
+          className="text-center max-w-2xl mx-auto mb-8"
         >
           <span className="text-xs uppercase tracking-[0.2em] text-[#835423] font-bold block mb-2">
             THỰC ĐƠN ĐẶC SẢN LUMINA • ARTISANAL ROASTERY
@@ -456,27 +463,29 @@ export const MenuView: React.FC<MenuViewProps> = ({
         {/* Scroll anchor point for pagination */}
         <div ref={gridTopRef} />
 
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-16 bg-white rounded-2xl border border-[#e8dfd1] p-8"
-          >
-            <Coffee className="w-12 h-12 text-[#837469] mx-auto mb-3 opacity-40" />
-            <h3 className="font-serif text-xl font-bold text-[#2c1810] mb-1">
-              Không tìm thấy sản phẩm phù hợp
-            </h3>
-            <p className="text-xs text-[#837469] mb-6 max-w-md mx-auto leading-relaxed">
-              Hãy thử tìm kiếm với nốt hương khác hoặc đặt lại bộ lọc để khám phá toàn bộ mẻ rang mộc thủ công của Lumina.
-            </p>
-            <button
-              onClick={handleResetFilters}
-              className="py-2.5 px-6 rounded-xl bg-[#d36b00] hover:bg-[#b85b00] text-white text-xs font-bold cursor-pointer transition-colors shadow-xs"
-            >
-              Xem tất cả sản phẩm
-            </button>
-          </motion.div>
+        {/* Products Grid / Skeleton Loading / Empty States */}
+        {isLoading ? (
+          <ProductSkeletonGrid count={itemsPerPage} />
+        ) : filteredProducts.length === 0 ? (
+          searchQuery.trim() !== '' ? (
+            <ProductEmptyState
+              variant="search-empty"
+              searchQuery={searchQuery}
+              onClearSearch={() => setSearchQuery('')}
+              onResetFilters={handleResetFilters}
+              onSuggestionClick={(kw) => setSearchQuery(kw)}
+            />
+          ) : activeFiltersCount > 0 ? (
+            <ProductEmptyState
+              variant="filter-empty"
+              onResetFilters={handleResetFilters}
+            />
+          ) : (
+            <ProductEmptyState
+              variant="catalog-empty"
+              onRetry={handleResetFilters}
+            />
+          )
         ) : (
           <div>
             <motion.div

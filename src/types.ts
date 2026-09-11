@@ -20,12 +20,18 @@ export interface Product {
   roastLevel?: 'Light' | 'Medium-Light' | 'Medium' | 'Medium-Dark' | 'Dark';
   imageUrl: string;
   inStock?: boolean;
+  roastDate?: string;
+  peakFlavorWindow?: string;
+  isBeanProduct?: boolean;
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
   grindOption?: string;
+  weightOption?: '250g' | '500g' | '1kg';
+  subscriptionOption?: 'none' | 'bi-weekly' | 'monthly';
+  unitPrice?: number;
   sweetness?: string;
   milkOption?: string;
   temperature?: 'Nóng' | 'Đá';
@@ -58,7 +64,7 @@ export interface BranchLocation {
   isPopular?: boolean;
 }
 
-export type ViewTab = 'home' | 'about' | 'menu' | 'locations';
+export type ViewTab = 'home' | 'about' | 'menu' | 'locations' | 'product-detail';
 
 export interface UserProfile {
   id: string;

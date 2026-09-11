@@ -23,7 +23,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-interface QuickDeliveryModalProps {
+export interface QuickDeliveryModalProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems: CartItem[];
@@ -32,9 +32,10 @@ interface QuickDeliveryModalProps {
   onAddToCart: (item: CartItem) => void;
   onConfirmOrder: (order: QuickDeliveryOrder) => void;
   onOpenAuthModal?: () => void;
+  isStandalone?: boolean;
 }
 
-const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
+export const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
   onClose,
   cartItems,
   currentUser,
@@ -42,6 +43,7 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
   onAddToCart,
   onConfirmOrder,
   onOpenAuthModal,
+  isStandalone = false,
 }) => {
   const { message } = App.useApp();
   const [form] = Form.useForm();
@@ -72,8 +74,10 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
     }
   }, [currentUser, form]);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const isFreeShip = subtotal >= 120000 || (currentUser && currentUser.membershipTier === 'Hội viên Vàng');
+  const getItemPrice = (item: CartItem) => item.unitPrice ?? item.product.price;
+  const subtotal = cartItems.reduce((acc, item) => acc + getItemPrice(item) * item.quantity, 0);
+  const hasSubscription = cartItems.some((item) => item.subscriptionOption && item.subscriptionOption !== 'none');
+  const isFreeShip = hasSubscription || subtotal >= 120000 || (currentUser && currentUser.membershipTier === 'Hội viên Vàng');
   const shippingFee = subtotal === 0 ? 0 : isFreeShip ? 0 : 25000;
   // 10% discount for members
   const memberDiscount = currentUser ? Math.round(subtotal * 0.1) : 0;
@@ -127,34 +131,22 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
     }, 750);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans">
-      {/* Backdrop with smooth fade */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs cursor-pointer"
-            onClick={onClose}
-          />
-
-          {/* Modal Container with smooth spring scale */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 14 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 10 }}
-            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full max-w-2xl bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-stone-200 my-6 max-h-[92vh] overflow-y-auto"
-          >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute right-4 top-4 w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-700 transition-colors cursor-pointer z-10"
-            >
-              <X className="w-5 h-5" />
-            </button>
+  const cardContent = (
+    <div
+      className={`relative z-10 w-full max-w-2xl bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 ${
+        isStandalone ? 'mx-auto my-4 shadow-xl' : 'shadow-2xl my-6 max-h-[92vh] overflow-y-auto'
+      }`}
+    >
+      {/* Close Button - hidden in standalone mode */}
+      {!isStandalone && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-700 transition-colors cursor-pointer z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
 
             {/* Modal Header */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between pb-4 border-b border-stone-200 mb-5 gap-3 pr-8">
@@ -424,9 +416,28 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
                             <h5 className="font-sans font-bold text-stone-900 truncate">
                               {item.product.name}
                             </h5>
-                            <span className="text-[11px] text-stone-500 block truncate">
-                              {item.grindOption || item.sweetness || 'Pha chế chuẩn Barista'}
-                            </span>
+                            <div className="flex flex-wrap gap-1 text-[10px] text-stone-500 mt-0.5">
+                              {item.weightOption && (
+                                <span className="bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded font-semibold">
+                                  {item.weightOption}
+                                </span>
+                              )}
+                              {item.subscriptionOption && item.subscriptionOption !== 'none' && (
+                                <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-semibold">
+                                  Định kỳ (-15%)
+                                </span>
+                              )}
+                              {item.grindOption && (
+                                <span className="bg-stone-100 px-1.5 py-0.2 rounded truncate max-w-[140px]">
+                                  {item.grindOption}
+                                </span>
+                              )}
+                              {item.sweetness && (
+                                <span className="bg-stone-100 px-1.5 py-0.2 rounded">
+                                  {item.sweetness}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -450,7 +461,7 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
                           </div>
 
                           <span className="font-bold text-stone-900 w-20 text-right">
-                            {(item.product.price * item.quantity).toLocaleString('vi-VN')}đ
+                            {(getItemPrice(item) * item.quantity).toLocaleString('vi-VN')}đ
                           </span>
                         </div>
                       </motion.div>
@@ -606,8 +617,37 @@ const QuickDeliveryModalContent: React.FC<QuickDeliveryModalProps> = ({
                 Cam kết giữ nhiệt chuẩn Barista, đóng lon bảo ôn và giao đúng hẹn.
               </p>
             </Form>
-          </motion.div>
-        </div>
+    </div>
+  );
+
+  if (isStandalone) {
+    return (
+      <div className="w-full py-4 px-2 sm:px-4 bg-[#fcf9f8] flex justify-center font-sans">
+        {cardContent}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22 }}
+        className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs cursor-pointer"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 14 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 10 }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full flex justify-center"
+      >
+        {cardContent}
+      </motion.div>
+    </div>
   );
 };
 
@@ -617,4 +657,8 @@ export const QuickDeliveryModal: React.FC<QuickDeliveryModalProps> = (props) => 
       {props.isOpen && <QuickDeliveryModalContent {...props} />}
     </AnimatePresence>
   );
+};
+
+export const QuickDeliveryStandalone: React.FC<Omit<QuickDeliveryModalProps, 'isOpen'>> = (props) => {
+  return <QuickDeliveryModalContent {...props} isOpen={true} isStandalone={true} />;
 };

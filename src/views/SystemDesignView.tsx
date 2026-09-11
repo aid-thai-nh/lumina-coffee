@@ -16,17 +16,52 @@ import {
   Database,
   Cpu,
   Monitor,
+  Globe,
+  Search,
+  Code,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Info,
+  RefreshCw,
+  Zap,
 } from 'lucide-react';
+import {
+  Button,
+  Badge,
+  Card,
+  StatCard,
+  EmptyState,
+  Skeleton,
+  SearchInput,
+  Input,
+  ProductCardSkeleton,
+  ProductEmptyState,
+  ProductEmptyVariant,
+} from '../core/components';
+import { useI18n } from '../core/i18n/I18nContext';
+import { useToast } from '../core/hooks/useNotification';
+import { FlagIcon } from '../core/i18n/FlagIcons';
+import { LanguageSwitcher } from '../core/i18n/LanguageSwitcher';
+import { projectConfig } from '../config/project.config';
 
 interface SystemDesignViewProps {
   onCopyNotice: (text: string) => void;
   onClose?: () => void;
 }
 
-export const SystemDesignView: React.FC<SystemDesignViewProps> = ({ onCopyNotice, onClose }) => {
+export const SystemDesignView: React.FC<SystemDesignViewProps> = ({
+  onCopyNotice,
+  onClose,
+}) => {
   const [activeSection, setActiveSection] = useState<'foundations' | 'typography' | 'components' | 'architecture'>('foundations');
   const [selectedRoast, setSelectedRoast] = useState<number>(2); // 0 to 4
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
+  const [demoSearch, setDemoSearch] = useState('');
+  const [emptyStateTab, setEmptyStateTab] = useState<ProductEmptyVariant>('search-empty');
+  const [isSkeletonPreviewLoading, setIsSkeletonPreviewLoading] = useState<boolean>(true);
+  const toast = useToast();
+  const { locale, setLocale, t } = useI18n();
 
   const copyToClipboard = (hex: string, name: string) => {
     navigator.clipboard.writeText(hex);
@@ -279,35 +314,164 @@ export const SystemDesignView: React.FC<SystemDesignViewProps> = ({ onCopyNotice
         {/* SECTION 3: COMPONENT SHOWCASE */}
         {activeSection === 'components' && (
           <div className="space-y-8">
-            {/* Buttons & Actions */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
-              <h3 className="font-serif text-2xl font-bold text-[#2c1810] mb-2">
-                Nút Bấm &amp; Tương Tác (Buttons &amp; CTAs)
-              </h3>
-              <p className="text-xs text-[#837469] mb-6">
-                Tuân thủ quy tắc tỷ lệ padding ngang = 2x padding dọc, phông chữ <code>Manrope</code> đậm và viền tinh tế.
+            {/* Core Component Library Intro */}
+            <div className="bg-gradient-to-r from-[#201206] to-[#2c1810] text-white rounded-2xl p-6 sm:p-8 border border-[#c68e58]/30 shadow-lg">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ea7c1b]/25 text-[#ffdcc3] text-xs font-bold uppercase mb-3">
+                <Component className="w-4 h-4 text-[#ea7c1b]" />
+                <span>Micro-UI Framework Primitives</span>
+              </div>
+              <h3 className="font-serif text-2xl font-bold mb-2">Thư Viện UI Component Cốt Lõi (Core Components)</h3>
+              <p className="text-white/80 text-sm max-w-2xl leading-relaxed">
+                Các linh kiện được chuẩn hóa theo Design Tokens, dễ dàng tùy biến giao diện, kết hợp sức mạnh thẩm mỹ của Tailwind CSS và tính tin cậy của Ant Design.
               </p>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <button className="px-7 py-3.5 rounded-xl bg-[#d36b00] hover:bg-[#b85b00] text-white font-bold text-sm shadow-md transition-all cursor-pointer">
-                  Primary CTA (#D36B00)
-                </button>
+            {/* Core Buttons Showcase */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-[#2c1810]">Core Button Primitive</h4>
+                  <p className="text-xs text-[#837469]">5 variants, 3 kích thước, hỗ trợ icon và loading state</p>
+                </div>
+                <Badge variant="brand">src/core/components/Button.tsx</Badge>
+              </div>
 
-                <button className="px-7 py-3.5 rounded-xl bg-[#2c1810] hover:bg-[#38220f] text-white font-bold text-sm shadow-md transition-all cursor-pointer">
-                  Espresso Secondary (#2C1810)
-                </button>
+              <div className="p-6 bg-[#faf8f5] rounded-xl border border-[#e8dfd1] space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button variant="primary" size="md">Primary Button</Button>
+                  <Button variant="secondary" size="md">Secondary Button</Button>
+                  <Button variant="outline" size="md">Outline Button</Button>
+                  <Button variant="ghost" size="md">Ghost Button</Button>
+                  <Button variant="danger" size="md">Danger Button</Button>
+                  <Button variant="primary" size="md" isLoading>Loading State</Button>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-[#e8dfd1]">
+                  <Button variant="primary" size="sm" icon={<Coffee className="w-3.5 h-3.5" />}>Small (sm)</Button>
+                  <Button variant="primary" size="md" icon={<Coffee className="w-4 h-4" />}>Medium (md)</Button>
+                  <Button variant="primary" size="lg" icon={<Coffee className="w-5 h-5" />}>Large (lg)</Button>
+                </div>
+              </div>
+            </div>
 
-                <button className="px-7 py-3.5 rounded-xl border-2 border-[#c68e58] text-[#38220f] font-bold text-sm hover:bg-[#c68e58] hover:text-white transition-all cursor-pointer">
-                  Tertiary Outlined (#C68E58)
-                </button>
+            {/* Core Badges & Status */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-[#2c1810]">Core Badges &amp; Status Indicators</h4>
+                  <p className="text-xs text-[#837469]">Nhãn trạng thái trực quan với dot indicator</p>
+                </div>
+                <Badge variant="brand">src/core/components/Badge.tsx</Badge>
+              </div>
 
-                <button className="px-5 py-2.5 rounded-full bg-[#f0eded] text-[#51443a] font-semibold text-xs hover:bg-[#e5e2e1] transition-all cursor-pointer">
-                  Filter Pill Tag
-                </button>
+              <div className="p-6 bg-[#faf8f5] rounded-xl border border-[#e8dfd1] flex flex-wrap items-center gap-3">
+                <Badge variant="brand" dot>Brand Coffee</Badge>
+                <Badge variant="success" dot>Giao nhanh 30p</Badge>
+                <Badge variant="warning" dot>Sắp hết hạt</Badge>
+                <Badge variant="error" dot>Tạm ngưng nhận đơn</Badge>
+                <Badge variant="info" dot>Workshop tháng 9</Badge>
+                <Badge variant="neutral">Khách vãng lai</Badge>
+              </div>
+            </div>
 
-                <button className="w-11 h-11 rounded-full bg-[#ea7c1b] text-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform cursor-pointer">
-                  <Coffee className="w-5 h-5" />
-                </button>
+            {/* Core Inputs & Debounced Search */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-[#2c1810]">Core Form Controls &amp; Search</h4>
+                  <p className="text-xs text-[#837469]">Tích hợp debounce, icon prefix/suffix và kiểm tra lỗi</p>
+                </div>
+                <Badge variant="brand">src/core/components/SearchInput.tsx</Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 bg-[#faf8f5] rounded-xl border border-[#e8dfd1]">
+                <div>
+                  <label className="text-xs font-semibold text-[#51443a] block mb-1.5">
+                    Thử nghiệm Live Search Input (Debounce 300ms):
+                  </label>
+                  <SearchInput
+                    placeholder="Nhập thử từ khóa tìm kiếm..."
+                    value={demoSearch}
+                    onSearch={(val) => setDemoSearch(val)}
+                  />
+                  <div className="mt-2 text-[11px] text-[#837469] font-mono">
+                    Kết quả nhận tức thì: <span className="font-bold text-[#d36b00]">"{demoSearch}"</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Input
+                    label="Họ tên khách hàng (Core Input)"
+                    placeholder="Nguyễn Văn A"
+                    helperText="Tên trên thẻ hội viên Lumina Club"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Core StatCard Showcase */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-[#2c1810]">Core Stat Cards &amp; Metrics</h4>
+                  <p className="text-xs text-[#837469]">Thẻ chỉ số hiệu năng và KPI bán hàng</p>
+                </div>
+                <Badge variant="brand">src/core/components/StatCard.tsx</Badge>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <StatCard
+                  title="Đơn Giao Hôm Nay"
+                  value="142 đơn"
+                  subtitle="Tỉ lệ đúng hẹn 98.4%"
+                  icon={<Coffee className="w-4 h-4" />}
+                  trend={{ value: 12.5, isPositive: true, label: 'so với hôm qua' }}
+                />
+                <StatCard
+                  title="Điểm Cupping SCA TB"
+                  value="87.5 / 100"
+                  subtitle="Mẻ Cầu Đất Typica #402"
+                  icon={<Sparkles className="w-4 h-4" />}
+                  trend={{ value: 2.1, isPositive: true }}
+                />
+                <StatCard
+                  title="Học Viên Workshop"
+                  value="28 chỗ"
+                  subtitle="Đã kín 92% suất tháng này"
+                  icon={<Flame className="w-4 h-4" />}
+                  trend={{ value: 4.8, isPositive: true }}
+                />
+              </div>
+            </div>
+
+            {/* Core Empty State & Skeleton */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-[#2c1810]">Core Empty State &amp; Skeleton Loader</h4>
+                  <p className="text-xs text-[#837469]">Trạng thái tải dữ liệu và danh sách trống</p>
+                </div>
+                <Badge variant="brand">src/core/components/EmptyState.tsx</Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-[#faf8f5] rounded-xl border border-[#e8dfd1]">
+                <EmptyState
+                  title="Chưa có món nào trong giỏ"
+                  description="Khám phá ngay các dòng hạt cà phê đặc sản và cold brew để thêm vào đơn hàng."
+                  actionText="Xem Thực Đơn Ngay"
+                  onAction={() => onCopyNotice('Chuyển hướng đến Menu')}
+                />
+
+                <div className="bg-white p-6 rounded-2xl border border-[#e8dfd1] space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton variant="circular" width={48} height={48} />
+                    <div className="space-y-1.5 flex-1">
+                      <Skeleton variant="text" width="60%" />
+                      <Skeleton variant="text" width="40%" />
+                    </div>
+                  </div>
+                  <Skeleton variant="rectangular" height={90} />
+                  <Skeleton variant="text" width="80%" />
+                </div>
               </div>
             </div>
 
@@ -390,6 +554,239 @@ export const SystemDesignView: React.FC<SystemDesignViewProps> = ({ onCopyNotice
                 <span className="px-3 py-1 rounded bg-[#835423] text-white text-[10px] font-bold uppercase tracking-widest">
                   SINGLE ORIGIN
                 </span>
+              </div>
+            </div>
+
+            {/* API STATES & FEEDBACK SYSTEM: SKELETON, EMPTY, ERROR, TOAST NOTIFICATION */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#e8dfd1] shadow-xs space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-5 h-5 text-[#ea7c1b]" />
+                  <h3 className="font-serif text-2xl font-bold text-[#2c1810]">
+                    Hệ Thống Phản Hồi API &amp; Trạng Thái Tương Tác
+                  </h3>
+                </div>
+                <p className="text-xs text-[#837469]">
+                  Chuẩn hóa toàn diện 3 khía cạnh: Skeleton Loading đồng bộ layout, 4 biến thể Empty State, và hệ thống Thông báo (Toast Notifications) độc quyền.
+                </p>
+              </div>
+
+              {/* Subsection 1: Synchronized Skeleton Loading */}
+              <div className="p-6 bg-[#fcf9f8] rounded-2xl border border-[#e8dfd1]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-[#d36b00] tracking-wider block">
+                      MODULE 01 • LOADING STATE
+                    </span>
+                    <h4 className="font-serif text-lg font-bold text-[#2c1810]">
+                      Product Card Skeleton với Hiệu Ứng Ánh Sáng (Shimmer)
+                    </h4>
+                    <p className="text-xs text-[#837469]">
+                      Đồng bộ 100% về kích thước khung ảnh (4:3), badge, tiêu đề 2 dòng, nốt hương và giá tiền với thẻ sản phẩm thật.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsSkeletonPreviewLoading(!isSkeletonPreviewLoading)}
+                    className="px-4 py-2 bg-[#2c1810] text-[#ffdcc3] hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSkeletonPreviewLoading ? 'animate-spin' : ''}`} />
+                    <span>{isSkeletonPreviewLoading ? 'Đang bật Skeleton' : 'Bật lại Skeleton'}</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+                  {/* Skeleton Card Preview */}
+                  <div>
+                    <span className="text-[11px] font-bold text-[#835423] block mb-2 uppercase">
+                      1. Giao diện Skeleton Loading:
+                    </span>
+                    <ProductCardSkeleton />
+                  </div>
+
+                  {/* Architecture Specs */}
+                  <div className="bg-white p-5 rounded-2xl border border-[#e8dfd1] flex flex-col justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-[#2c1810] block mb-3 uppercase tracking-wider">
+                        Thông Số Kỹ Thuật Skeleton:
+                      </span>
+                      <ul className="text-xs text-[#51443a] space-y-2.5">
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                          <span><strong>Khối hình ảnh:</strong> Tỉ lệ 4:3 (aspect-[4/3]), bo góc rounded-xl, tích hợp sẵn placeholder badge.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                          <span><strong>Hiệu ứng Shimmer:</strong> Gradient trôi 1.8s ánh sáng kem ấm, không gây chói mắt.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
+                          <span><strong>Không giật layout (Zero CLS):</strong> Chiều cao thẻ skeleton tương đương thẻ thật 100%.</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#f0eded] text-[11px] text-[#837469]">
+                      Component: <code>&lt;ProductCardSkeleton /&gt;</code> &amp; <code>&lt;ProductSkeletonGrid count={'{6}'} /&gt;</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subsection 2: 4 Empty State Scenarios */}
+              <div className="p-6 bg-[#fcf9f8] rounded-2xl border border-[#e8dfd1]">
+                <div className="mb-4">
+                  <span className="text-[10px] uppercase font-bold text-[#d36b00] tracking-wider block">
+                    MODULE 02 • ZERO DATA &amp; ERROR STATES
+                  </span>
+                  <h4 className="font-serif text-lg font-bold text-[#2c1810] mb-1">
+                    4 Kịch Bản Rỗng Dữ Liệu &amp; Lỗi Máy Chủ
+                  </h4>
+                  <p className="text-xs text-[#837469]">
+                    Xử lý tinh tế hành vi người dùng khi không tìm thấy món, bộ lọc không trùng khớp, hoặc API phản hồi lỗi.
+                  </p>
+                </div>
+
+                {/* Tabs to switch Empty State variants */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {[
+                    { id: 'search-empty', label: '1. Tìm kiếm không ra (Search)' },
+                    { id: 'filter-empty', label: '2. Bộ lọc không khớp (Filter)' },
+                    { id: 'catalog-empty', label: '3. Danh mục rỗng (Catalog)' },
+                    { id: 'error', label: '4. Lỗi kết nối API (Error 500)' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setEmptyStateTab(tab.id as ProductEmptyVariant)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        emptyStateTab === tab.id
+                          ? 'bg-[#2c1810] text-white shadow-xs'
+                          : 'bg-white hover:bg-[#efe8de] text-[#51443a] border border-[#e8dfd1]'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Live Preview of Selected Empty State */}
+                <div className="bg-white rounded-2xl border border-[#e8dfd1] p-4 sm:p-6 shadow-xs">
+                  <ProductEmptyState
+                    variant={emptyStateTab}
+                    searchQuery={emptyStateTab === 'search-empty' ? 'Arabica Geisha Cầu Đất #999' : undefined}
+                    onClearSearch={() => toast.info('Đã xóa từ khóa tìm kiếm')}
+                    onResetFilters={() => toast.success('Đã đặt lại toàn bộ bộ lọc')}
+                    onRetry={() => toast.success('Đang gửi lại yêu cầu API...')}
+                    onSuggestionClick={(kw) => toast.info(`Đang áp dụng gợi ý: "${kw}"`)}
+                  />
+                </div>
+              </div>
+
+              {/* Subsection 3: Unified Notification Toast System */}
+              <div className="p-6 bg-[#fcf9f8] rounded-2xl border border-[#e8dfd1]">
+                <div className="mb-4">
+                  <span className="text-[10px] uppercase font-bold text-[#d36b00] tracking-wider block">
+                    MODULE 03 • NOTIFICATION &amp; TOAST MESSAGES
+                  </span>
+                  <h4 className="font-serif text-lg font-bold text-[#2c1810] mb-1">
+                    Hệ Thống Thông Báo Nhận Diện Thương Hiệu (4 Biến Thể)
+                  </h4>
+                  <p className="text-xs text-[#837469]">
+                    Toast nổi ở góc phải màn hình, thiết kế cao cấp với icon đặc trưng, âm sắc espresso và tự động đóng sau 3.5s.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                  {/* Success Toast Trigger */}
+                  <div className="bg-white p-4 rounded-xl border border-emerald-200 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 text-emerald-800 font-bold text-xs">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Success Toast</span>
+                      </div>
+                      <p className="text-[11px] text-[#837469] mb-3">
+                        Báo thêm giỏ hàng, hoàn tất thanh toán hoặc lưu cấu hình thành công.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        toast.success('Đã thêm Arabica Cầu Đất vào giỏ hàng thành công!', {
+                          title: 'Thành công',
+                        })
+                      }
+                      className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors"
+                    >
+                      Bắn Toast Success
+                    </button>
+                  </div>
+
+                  {/* Failed / Error Toast Trigger */}
+                  <div className="bg-white p-4 rounded-xl border border-rose-200 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 text-rose-800 font-bold text-xs">
+                        <XCircle className="w-4 h-4 text-rose-600" />
+                        <span>Failed / Error</span>
+                      </div>
+                      <p className="text-[11px] text-[#837469] mb-3">
+                        Báo lỗi API mạng, số dư không đủ hoặc thao tác máy chủ thất bại.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        toast.error('Máy chủ phản hồi mã HTTP 500: Kết nối API quá thời gian.', {
+                          title: 'Lỗi hệ thống',
+                        })
+                      }
+                      className="w-full py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors"
+                    >
+                      Bắn Toast Failed
+                    </button>
+                  </div>
+
+                  {/* Warning Toast Trigger */}
+                  <div className="bg-white p-4 rounded-xl border border-amber-200 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 text-amber-800 font-bold text-xs">
+                        <AlertCircle className="w-4 h-4 text-amber-600" />
+                        <span>Warning Toast</span>
+                      </div>
+                      <p className="text-[11px] text-[#837469] mb-3">
+                        Báo tồn kho sắp hết, định dạng input cần kiểm tra hoặc cảnh báo phiên.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        toast.warning('Mẻ rang Typica Anaerobic của tuần này chỉ còn lại 3 gói!', {
+                          title: 'Cảnh báo kho',
+                        })
+                      }
+                      className="w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors"
+                    >
+                      Bắn Toast Warning
+                    </button>
+                  </div>
+
+                  {/* Info Toast Trigger */}
+                  <div className="bg-white p-4 rounded-xl border border-[#e8dfd1] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 text-[#2c1810] font-bold text-xs">
+                        <Info className="w-4 h-4 text-[#ea7c1b]" />
+                        <span>Info Toast</span>
+                      </div>
+                      <p className="text-[11px] text-[#837469] mb-3">
+                        Báo trạng thái đơn hàng, thông tin mẻ rang mới hoặc bản tin cập nhật.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        toast.info('Barista Lumina đang hoàn tất đóng gói đơn hàng của bạn.', {
+                          title: 'Thông tin đơn',
+                        })
+                      }
+                      className="w-full py-1.5 bg-[#2c1810] hover:bg-[#422518] text-white rounded-lg text-xs font-bold cursor-pointer transition-colors"
+                    >
+                      Bắn Toast Info
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -480,6 +877,111 @@ export const SystemDesignView: React.FC<SystemDesignViewProps> = ({ onCopyNotice
                   </div>
                   <div className="pt-4 mt-4 border-t border-[#e8dfd1] text-[11px] text-[#837469]">
                     SCA Standardized Scoring Model
+                  </div>
+                </div>
+              </div>
+
+              {/* Deep Dive Architecture: i18n & SEO Engine */}
+              <div className="mt-8 pt-8 border-t border-[#e8dfd1] grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* i18n Specification */}
+                <div className="p-6 bg-[#faf8f5] rounded-2xl border border-[#e8dfd1]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-[#835423]" />
+                      <h4 className="font-serif text-lg font-bold text-[#2c1810]">Hệ Thống Đa Ngôn Ngữ (i18n Engine)</h4>
+                    </div>
+                    <Badge variant="brand">VI / EN</Badge>
+                  </div>
+                  <p className="text-xs text-[#51443a] leading-relaxed mb-4">
+                    Kiến trúc từ điển đa tầng (nested dictionary keys) với tính năng nội suy tham số <code>t('key', &#123; name &#125;)</code>, đồng bộ thuộc tính <code>&lt;html lang=""&gt;</code> và ghi nhớ phiên trong <code>localStorage</code>.
+                  </p>
+                  <div className="p-3.5 bg-white rounded-xl border border-[#e8dfd1] text-xs font-mono text-[#2c1810] space-y-1.5 mb-3">
+                    <div><span className="text-[#837469]">Locale hiện tại:</span> <span className="text-[#ea7c1b] font-bold uppercase">{locale}</span></div>
+                    <div><span className="text-[#837469]">Khóa mẫu:</span> <span className="text-blue-700 font-semibold">t('nav.quickOrder')</span></div>
+                    <div><span className="text-[#837469]">Kết quả:</span> <span className="text-emerald-700 font-semibold">"{t('nav.quickOrder')}"</span></div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={locale === 'vi' ? 'primary' : 'outline'}
+                        size="sm"
+                        icon={<FlagIcon country="vi" size="xs" />}
+                        onClick={() => setLocale('vi')}
+                      >
+                        Tiếng Việt
+                      </Button>
+                      <Button
+                        variant={locale === 'en' ? 'primary' : 'outline'}
+                        size="sm"
+                        icon={<FlagIcon country="en" size="xs" />}
+                        onClick={() => setLocale('en')}
+                      >
+                        English
+                      </Button>
+                    </div>
+                    <div className="border-l border-[#e8dfd1] pl-3">
+                      <LanguageSwitcher variant="dropdown" dropdownPlacement="top-left" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* SEO & Meta Specification */}
+                <div className="p-6 bg-[#faf8f5] rounded-2xl border border-[#e8dfd1]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Search className="w-5 h-5 text-[#d36b00]" />
+                      <h4 className="font-serif text-lg font-bold text-[#2c1810]">Chuẩn SEO &amp; Structured Data</h4>
+                    </div>
+                    <Badge variant="success">Schema.org JSON-LD</Badge>
+                  </div>
+                  <p className="text-xs text-[#51443a] leading-relaxed mb-4">
+                    Tự động đồng bộ thẻ tiêu đề <code>document.title</code>, Canonical URLs, OpenGraph, Twitter Cards và bơm cấu trúc thực thể <code>@type: CoffeeShop</code> vào mã nguồn.
+                  </p>
+                  <div className="p-3.5 bg-white rounded-xl border border-[#e8dfd1] text-xs font-mono text-[#2c1810] space-y-1.5">
+                    <div><span className="text-[#837469]">Title Template:</span> <span className="text-blue-700">{projectConfig.seo.titleTemplate}</span></div>
+                    <div><span className="text-[#837469]">Canonical:</span> <span className="text-[#51443a] truncate block">{projectConfig.seo.canonicalUrl}</span></div>
+                    <div><span className="text-[#837469]">Schema Type:</span> <span className="text-emerald-700 font-bold">CoffeeShop (LocalBusiness)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deep Dive: API Client & Custom Hooks */}
+              <div className="mt-8 pt-8 border-t border-[#e8dfd1]">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Code className="w-5 h-5 text-[#835423]" />
+                    <h4 className="font-serif text-xl font-bold text-[#2c1810]">Tầng Dịch Vụ API &amp; Danh Mục Custom Hooks</h4>
+                  </div>
+                  <span className="text-xs text-[#837469] font-mono">src/core/services &amp; src/core/hooks</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-xl bg-[#faf8f5] border border-[#e8dfd1]">
+                    <div className="font-mono text-xs font-bold text-[#835423] mb-1">apiClient</div>
+                    <p className="text-[11px] text-[#51443a]">
+                      HTTP Client wrapper với Bearer Auth, Request Timeout, Error boundary và Mock Adapter (chuyển live API trong 1 nốt nhạc).
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[#faf8f5] border border-[#e8dfd1]">
+                    <div className="font-mono text-xs font-bold text-[#835423] mb-1">useApi&lt;T&gt;</div>
+                    <p className="text-[11px] text-[#51443a]">
+                      Quản lý async lifecycle (data, loading, error, execute, refetch) chuẩn mực.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[#faf8f5] border border-[#e8dfd1]">
+                    <div className="font-mono text-xs font-bold text-[#835423] mb-1">useDebounce</div>
+                    <p className="text-[11px] text-[#51443a]">
+                      Tối ưu hóa tìm kiếm trực tiếp, tránh re-render và nghẽn mạng khi gõ phím nhanh.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[#faf8f5] border border-[#e8dfd1]">
+                    <div className="font-mono text-xs font-bold text-[#835423] mb-1">useResponsive</div>
+                    <p className="text-[11px] text-[#51443a]">
+                      Nhận diện breakpoints <code>isMobile</code>, <code>isTablet</code>, <code>isDesktop</code> theo thời gian thực.
+                    </p>
                   </div>
                 </div>
               </div>

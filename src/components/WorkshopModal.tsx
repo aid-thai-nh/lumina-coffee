@@ -3,10 +3,11 @@ import { App, Form, Input, Select } from 'antd';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Users, CheckCircle, Clock, Coffee, X, ArrowRight } from 'lucide-react';
 
-interface WorkshopModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (message: string) => void;
+export interface WorkshopModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSuccess?: (message: string) => void;
+  isStandalone?: boolean;
 }
 
 interface WorkshopFormValues {
@@ -18,7 +19,11 @@ interface WorkshopFormValues {
   email: string;
 }
 
-const WorkshopModalContent: React.FC<WorkshopModalProps> = ({ onClose, onSuccess }) => {
+export const WorkshopModalContent: React.FC<WorkshopModalProps> = ({
+  onClose = () => {},
+  onSuccess = (_msg: string) => {},
+  isStandalone = false,
+}) => {
   const { message } = App.useApp();
   const [form] = Form.useForm<WorkshopFormValues>();
   const [submitting, setSubmitting] = useState(false);
@@ -49,27 +54,12 @@ const WorkshopModalContent: React.FC<WorkshopModalProps> = ({ onClose, onSuccess
     return '800.000đ (Ưu đãi nhóm)';
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans">
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.22 }}
-        className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs cursor-pointer"
-        onClick={onClose}
-      />
-
-      {/* Modal Container */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 14 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 10 }}
-        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-lg bg-white rounded-2xl p-5 sm:p-7 shadow-2xl border border-stone-200 overflow-hidden my-6 max-h-[92vh] overflow-y-auto"
-      >
-        {/* Close Button */}
+  const cardContent = (
+    <div className={`relative z-10 w-full max-w-lg bg-white rounded-2xl p-5 sm:p-7 border border-stone-200 overflow-hidden ${
+      isStandalone ? 'mx-auto my-2 shadow-none' : 'shadow-2xl my-6 max-h-[92vh] overflow-y-auto'
+    }`}>
+      {/* Close Button */}
+      {!isStandalone && (
         <button
           type="button"
           onClick={onClose}
@@ -77,6 +67,7 @@ const WorkshopModalContent: React.FC<WorkshopModalProps> = ({ onClose, onSuccess
         >
           <X className="w-5 h-5" />
         </button>
+      )}
 
         <div className="flex items-center gap-2 mb-2 pr-8">
           <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-800 flex items-center justify-center">
@@ -249,6 +240,31 @@ const WorkshopModalContent: React.FC<WorkshopModalProps> = ({ onClose, onSuccess
             </div>
           </Form>
         )}
+    </div>
+  );
+
+  if (isStandalone) {
+    return cardContent;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22 }}
+        className="fixed inset-0 bg-stone-900/50 backdrop-blur-xs cursor-pointer"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 14 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 10 }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full flex justify-center"
+      >
+        {cardContent}
       </motion.div>
     </div>
   );

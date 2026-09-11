@@ -2,13 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ConfigProvider, App as AntdApp, message } from 'antd';
 import viVN from 'antd/locale/vi_VN';
-import { luminaAntdTheme } from './theme/themeConfig';
+import { coreAntdTheme } from './core/theme/antdTheme';
+import { I18nProvider, useI18n } from './core/i18n/I18nContext';
+import { ToastProvider, useToast } from './core/notification/ToastContext';
+import { SEOHead } from './core/seo/SEOHead';
+import { ClientReviewBar } from './core/review-bar/ClientReviewBar';
+import { AppPreloader } from './core/components/AppPreloader';
 import { ViewTab, Product, CartItem, UserProfile, QuickDeliveryOrder } from './types';
 import { PRODUCTS } from './data/coffeeData';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
-import { ProductDetailModal } from './components/ProductDetailModal';
 import { WorkshopModal } from './components/WorkshopModal';
 import { QuickDeliveryModal } from './components/QuickDeliveryModal';
 import { AuthModal } from './components/AuthModal';
@@ -17,11 +21,22 @@ import { HomeView } from './views/HomeView';
 import { MenuView } from './views/MenuView';
 import { AboutView } from './views/AboutView';
 import { LocationsView } from './views/LocationsView';
+import { ProductDetailView } from './views/ProductDetailView';
 import { SystemDesignView } from './views/SystemDesignView';
 import { CheckCircle2, X, Coffee, Sparkles, Layers, Bike } from 'lucide-react';
 
-export default function App() {
+function AppContent() {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState<ViewTab>('home');
+  const { t } = useI18n();
+
+  const tabTitles: Record<ViewTab, string> = {
+    home: t('nav.home'),
+    menu: t('nav.menu'),
+    about: t('nav.about'),
+    locations: t('nav.locations'),
+    'product-detail': 'Chi Tiết Sản Phẩm',
+  };
 
   // Scroll to top on page tab switch
   useEffect(() => {
@@ -90,6 +105,7 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSystemDesignOpen, setIsSystemDesignOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toast = useToast();
   const [orderSuccess, setOrderSuccess] = useState<{
     id: string;
     total: number;
@@ -100,10 +116,13 @@ export default function App() {
   } | null>(null);
 
   const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((prev) => (prev === msg ? null : prev));
-    }, 3500);
+    toast.success(msg, { title: 'Thông báo giỏ hàng' });
+  };
+
+  const handleOpenProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setCurrentTab('product-detail');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddToCart = (item: CartItem) => {
@@ -113,14 +132,18 @@ export default function App() {
           i.product.id === item.product.id &&
           i.grindOption === item.grindOption &&
           i.sweetness === item.sweetness &&
-          i.milkOption === item.milkOption
+          i.milkOption === item.milkOption &&
+          i.weightOption === item.weightOption &&
+          i.subscriptionOption === item.subscriptionOption
       );
       if (existingIdx > -1) {
-        const updated = [...prev];
-        updated[existingIdx].quantity += item.quantity;
-        return updated;
+        return prev.map((it, idx) =>
+          idx === existingIdx
+            ? { ...it, quantity: it.quantity + item.quantity }
+            : it
+        );
       }
-      return [...prev, item];
+      return [...prev, { ...item }];
     });
     showToast(`Đã thêm ${item.product.name} vào đơn hàng`);
   };
@@ -135,23 +158,20 @@ export default function App() {
 
   const handleUpdateQuantity = (index: number, delta: number) => {
     setCartItems((prev) => {
-      const updated = [...prev];
-      const newQty = updated[index].quantity + delta;
+      if (!prev[index]) return prev;
+      const target = prev[index];
+      const newQty = target.quantity + delta;
       if (newQty <= 0) {
-        updated.splice(index, 1);
-      } else {
-        updated[index].quantity = newQty;
+        return prev.filter((_, i) => i !== index);
       }
-      return updated;
+      return prev.map((item, i) =>
+        i === index ? { ...item, quantity: newQty } : item
+      );
     });
   };
 
   const handleRemoveItem = (index: number) => {
-    setCartItems((prev) => {
-      const updated = [...prev];
-      updated.splice(index, 1);
-      return updated;
-    });
+    setCartItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleClearCart = () => {
@@ -193,22 +213,17 @@ export default function App() {
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <ConfigProvider theme={luminaAntdTheme} locale={viVN}>
-      <AntdApp>
-        <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b] flex flex-col font-sans selection:bg-[#fdd5b8] selection:text-[#785b44]">
-          {/* Toast Notification */}
-          {toastMessage && (
-            <div className="fixed bottom-6 right-6 z-50 bg-[#2c1810] text-white px-4 py-3 rounded-xl shadow-2xl border border-[#c68e58]/40 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <Sparkles className="w-4 h-4 text-[#ea7c1b]" />
-              <span className="text-xs font-semibold">{toastMessage}</span>
-              <button
-                onClick={() => setToastMessage(null)}
-                className="text-white/60 hover:text-white ml-2 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+    <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b] flex flex-col font-sans selection:bg-[#fdd5b8] selection:text-[#785b44]">
+      {/* Specialty Coffee Preloader Screen */}
+      {isInitialLoading && (
+        <AppPreloader
+          minDuration={1600}
+          onComplete={() => setIsInitialLoading(false)}
+        />
+      )}
+
+      {/* Dynamic SEO & Meta Management */}
+      <SEOHead title={tabTitles[currentTab]} />
 
           {/* Top Header */}
           <Header
@@ -235,7 +250,7 @@ export default function App() {
                 >
                   <HomeView
                     onSelectTab={setCurrentTab}
-                    onOpenProductModal={setSelectedProduct}
+                    onOpenProductModal={handleOpenProduct}
                     onQuickAddToCart={handleQuickAdd}
                     onOpenWorkshopModal={() => setIsWorkshopOpen(true)}
                     onOpenQuickDelivery={() => setIsQuickDeliveryOpen(true)}
@@ -252,8 +267,27 @@ export default function App() {
                   transition={{ duration: 0.25 }}
                 >
                   <MenuView
-                    onOpenProductModal={setSelectedProduct}
+                    onOpenProductModal={handleOpenProduct}
                     onQuickAddToCart={handleQuickAdd}
+                  />
+                </motion.div>
+              )}
+
+              {currentTab === 'product-detail' && (
+                <motion.div
+                  key={`product-${selectedProduct?.id ?? 'default'}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <ProductDetailView
+                    product={selectedProduct ?? PRODUCTS[0]}
+                    onBackToMenu={() => setCurrentTab('menu')}
+                    onSelectProduct={handleOpenProduct}
+                    onAddToCart={handleAddToCart}
+                    onOpenQuickDelivery={() => setIsQuickDeliveryOpen(true)}
+                    onOpenCart={() => setIsCartOpen(true)}
                   />
                 </motion.div>
               )}
@@ -305,6 +339,7 @@ export default function App() {
             onRemoveItem={handleRemoveItem}
             onClearCart={handleClearCart}
             onOrderSuccess={handleOrderSuccess}
+            onAddToCart={handleAddToCart}
           />
 
           {/* Quick Delivery Streamlined Modal */}
@@ -338,13 +373,6 @@ export default function App() {
               setCartItems(reorder.items);
               setIsQuickDeliveryOpen(true);
             }}
-          />
-
-          {/* Product Detail Customization Modal */}
-          <ProductDetailModal
-            product={selectedProduct}
-            onClose={() => setSelectedProduct(null)}
-            onAddToCart={handleAddToCart}
           />
 
           {/* Workshop Booking Modal */}
@@ -485,8 +513,27 @@ export default function App() {
               />
             </div>
           )}
+
+          {/* Client Review Floating Bar */}
+          <ClientReviewBar
+            onOpenSystemDesign={() => setIsSystemDesignOpen(true)}
+            onReplayPreloader={() => setIsInitialLoading(true)}
+          />
         </div>
-      </AntdApp>
-    </ConfigProvider>
   );
 }
+
+export default function App() {
+  return (
+    <I18nProvider defaultLocale="vi">
+      <ConfigProvider theme={coreAntdTheme} locale={viVN}>
+        <AntdApp>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </AntdApp>
+      </ConfigProvider>
+    </I18nProvider>
+  );
+}
+

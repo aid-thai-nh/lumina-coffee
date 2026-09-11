@@ -91,7 +91,10 @@ export const PRODUCTS: Product[] = [
     process: 'Anaerobic Slow Dry (72h)',
     roastLevel: 'Light',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALAKTBZqoOx-bgQ7hevPg30x6MANNyI0kxEENPj278KWLDvTS2VN6wEU0Gqfbqg8NqAw9AR4aZsAjce-EKNnxhceQ_NZZyjsx8VbPCKI_V6GJ-Pubb5FL2h4a5eFngI-4__O4cf-ZV5ngNsgx8HzNs_s7Pi4R-8n2fG_032FZIBp2-f1kSkYuUsP6w61obwbffK7Yb0C5R1_-om9VPJmjSRpsDwp0jQ9FDzzcJu7WpZRDps3PXkrEt',
-    inStock: true
+    inStock: true,
+    isBeanProduct: true,
+    roastDate: '07:00 sáng Thứ Ba (Cách 2 ngày)',
+    peakFlavorWindow: 'Ngày 7 – 28 sau rang (Giai đoạn Degas hoàn hảo)',
   },
   {
     id: 'typica-langbiang-honey',
@@ -113,7 +116,10 @@ export const PRODUCTS: Product[] = [
     process: 'Yellow Honey Process',
     roastLevel: 'Medium-Light',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsqv5AgiYhpSUwZXHMAhBDDzw7OCeYRab6B_LACwk9HVck2Zvnx_id6eoKHc_etDlvPGADnS8yGXbzk0fIsJ8vycLuH5oPbL-8kxBN_sHgHtvzqx8Bsi4AGKF7jgvT2UsjsN0pnBXtXTzBMTUXCRpTtJClHSOwzqbErNh3AdSIyMPvtMsjPVkyGkoGX3q4a-J9oZpJ4xYRpSxuOMWJo-PCtfsVH2n99N1i9VigPxITd96-KP5t0Qed',
-    inStock: true
+    inStock: true,
+    isBeanProduct: true,
+    roastDate: '08:30 sáng Thứ Hai (Cách 3 ngày)',
+    peakFlavorWindow: 'Ngày 7 – 25 sau rang',
   },
   {
     id: 'dirty-latte-da-vien',
@@ -194,7 +200,10 @@ export const PRODUCTS: Product[] = [
     process: 'Washed Process',
     roastLevel: 'Light',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsqv5AgiYhpSUwZXHMAhBDDzw7OCeYRab6B_LACwk9HVck2Zvnx_id6eoKHc_etDlvPGADnS8yGXbzk0fIsJ8vycLuH5oPbL-8kxBN_sHgHtvzqx8Bsi4AGKF7jgvT2UsjsN0pnBXtXTzBMTUXCRpTtJClHSOwzqbErNh3AdSIyMPvtMsjPVkyGkoGX3q4a-J9oZpJ4xYRpSxuOMWJo-PCtfsVH2n99N1i9VigPxITd96-KP5t0Qed',
-    inStock: true
+    inStock: true,
+    isBeanProduct: true,
+    roastDate: '09:00 sáng Thứ Ba (Cách 2 ngày)',
+    peakFlavorWindow: 'Ngày 7 – 28 sau rang',
   },
   {
     id: 'cold-brew-sua-dua-bentre',
@@ -237,7 +246,10 @@ export const PRODUCTS: Product[] = [
     process: 'Anaerobic Natural',
     roastLevel: 'Medium-Dark',
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDyMHkiAWI7VHjowj6WQTEqgyzyuwpVg198hsBYk5ZtxJADCjPx4saLkGhclmgotwxvcHWGMzUdPSYfTrQWVWUQPKi69pXXVGlSLT9Wd6mAAUwaveBij_69eO60FsU1wSUx0AYeBjls5IdVFhAOmJiCdyvstovtOXr690tDwiDIUC9Dpg9RKV4BDYilqtq46L_Z_ZBbyuJE2EMXhzqmHVm_CVlwyOoOPiNNOkmlg42WvlB_jWz2NuwX',
-    inStock: true
+    inStock: true,
+    isBeanProduct: true,
+    roastDate: '06:00 sáng Thứ Hai (Cách 3 ngày)',
+    peakFlavorWindow: 'Ngày 10 – 35 sau rang (Robusta degas chậm)',
   },
   {
     id: 'flat-white-oatly-signature',
@@ -275,6 +287,40 @@ export const PRODUCTS: Product[] = [
     description: 'Phễu sứ thủ công được nghệ nhân làng gốm Bát Tràng vuốt tay riêng cho Lumina, các rãnh xoắn 60 độ tối ưu dòng chảy cho phương pháp pour-over.',
     tastingNotes: ['Giữ nhiệt hoàn hảo', 'Chất men tro mộc mạc', 'Dung tích 1-4 cup'],
     imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALAKTBZqoOx-bgQ7hevPg30x6MANNyI0kxEENPj278KWLDvTS2VN6wEU0Gqfbqg8NqAw9AR4aZsAjce-EKNnxhceQ_NZZyjsx8VbPCKI_V6GJ-Pubb5FL2h4a5eFngI-4__O4cf-ZV5ngNsgx8HzNs_s7Pi4R-8n2fG_032FZIBp2-f1kSkYuUsP6w61obwbffK7Yb0C5R1_-om9VPJmjSRpsDwp0jQ9FDzzcJu7WpZRDps3PXkrEt',
+    inStock: true
+  },
+  {
+    id: 'giay-loc-v60-hario',
+    name: 'Giấy Lọc Hario V60 02 (Túi 100 Tờ)',
+    category: 'gear',
+    categoryLabel: 'Phụ Kiện Pha',
+    tag: 'NHẬP KHẨU NHẬT',
+    tagColor: 'bg-[#755841]',
+    price: 85000,
+    originalPrice: 95000,
+    rating: 4.9,
+    reviewCount: 154,
+    brewInfo: 'Bột Giấy Tự Nhiên Không Tẩy Trắng',
+    description: 'Giấy lọc cao cấp nhập khẩu chính hãng từ Hario Nhật Bản, sợi giấy mịn giúp loại bỏ hoàn toàn cặn mịn và dầu cà phê, mang lại tách pour-over trong trẻo tuyệt đối.',
+    tastingNotes: ['Không mùi giấy sau khi tráng', 'Tốc độ dòng chảy chuẩn xác', 'Độ dai tuyệt hảo'],
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDyMHkiAWI7VHjowj6WQTEqgyzyuwpVg198hsBYk5ZtxJADCjPx4saLkGhclmgotwxvcHWGMzUdPSYfTrQWVWUQPKi69pXXVGlSLT9Wd6mAAUwaveBij_69eO60FsU1wSUx0AYeBjls5IdVFhAOmJiCdyvstovtOXr690tDwiDIUC9Dpg9RKV4BDYilqtq46L_Z_ZBbyuJE2EMXhzqmHVm_CVlwyOoOPiNNOkmlg42WvlB_jWz2NuwX',
+    inStock: true
+  },
+  {
+    id: 'muong-go-oc-cho',
+    name: 'Muỗng Đong Cà Phê Gỗ Óc Chó Thủ Công',
+    category: 'gear',
+    categoryLabel: 'Phụ Kiện Pha',
+    tag: 'WOODCRAFT',
+    tagColor: 'bg-[#2c1810]',
+    price: 65000,
+    originalPrice: 85000,
+    rating: 5.0,
+    reviewCount: 88,
+    brewInfo: 'Định Lượng Chuẩn 10g/Muỗng',
+    description: 'Tiện khắc thủ công từ gỗ óc chó Bắc Mỹ nguyên khối, phủ sáp ong tự nhiên an toàn thực phẩm. Định lượng chuẩn xác 10g hạt cà phê cho mỗi lần múc.',
+    tastingNotes: ['Gỗ óc chó sang trọng', 'Cầm đầm tay chắc chắn', 'Khắc laser logo Lumina'],
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsqv5AgiYhpSUwZXHMAhBDDzw7OCeYRab6B_LACwk9HVck2Zvnx_id6eoKHc_etDlvPGADnS8yGXbzk0fIsJ8vycLuH5oPbL-8kxBN_sHgHtvzqx8Bsi4AGKF7jgvT2UsjsN0pnBXtXTzBMTUXCRpTtJClHSOwzqbErNh3AdSIyMPvtMsjPVkyGkoGX3q4a-J9oZpJ4xYRpSxuOMWJo-PCtfsVH2n99N1i9VigPxITd96-KP5t0Qed',
     inStock: true
   }
 ];

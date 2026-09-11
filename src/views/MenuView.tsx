@@ -31,14 +31,28 @@ import {
 interface MenuViewProps {
   onOpenProductModal: (product: Product) => void;
   onQuickAddToCart: (product: Product) => void;
+  onBackToHome?: () => void;
+  selectedCategory?: string;
+  onSelectCategory?: (category: string) => void;
 }
 
 export const MenuView: React.FC<MenuViewProps> = ({
   onOpenProductModal,
   onQuickAddToCart,
+  onBackToHome,
+  selectedCategory: propCategory,
+  onSelectCategory: propOnSelectCategory,
 }) => {
   // Main filter states
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [internalCategory, setInternalCategory] = useState<string>('all');
+  const selectedCategory = propCategory ?? internalCategory;
+  const setSelectedCategory = (cat: string) => {
+    if (propOnSelectCategory) {
+      propOnSelectCategory(cat);
+    } else {
+      setInternalCategory(cat);
+    }
+  };
   const [selectedRoast, setSelectedRoast] = useState<string>('all');
   const [selectedOrigin, setSelectedOrigin] = useState<string>('all');
   const [selectedProcess, setSelectedProcess] = useState<string>('all');
@@ -232,9 +246,9 @@ export const MenuView: React.FC<MenuViewProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full bg-[#fcf9f8] min-h-screen py-12 lg:py-16 overflow-hidden"
+      className="w-full bg-[#fcf9f8] min-h-screen pb-16 overflow-x-clip"
     >
-      <div className="lumina-container">
+      <div className="lumina-container pt-6 sm:pt-10">
         {/* Header Title with Editorial Typography */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

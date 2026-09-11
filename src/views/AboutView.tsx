@@ -127,9 +127,9 @@ export const AboutView: React.FC<AboutViewProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full bg-[#fcf9f8] min-h-screen py-12 lg:py-16 overflow-hidden"
+      className="w-full bg-[#fcf9f8] min-h-screen pb-16 overflow-x-clip"
     >
-      <div className="lumina-container">
+      <div className="lumina-container pt-6 sm:pt-10">
         {/* Editorial Story Header */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center mb-20">
           <motion.div

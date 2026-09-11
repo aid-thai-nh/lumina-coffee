@@ -4,7 +4,7 @@ import { Rate, App, Tooltip } from 'antd';
 import { Product, CartItem } from '../types';
 import { PRODUCTS } from '../data/coffeeData';
 import {
-  ArrowLeft,
+  Home,
   Sparkles,
   Star,
   Share2,
@@ -39,6 +39,7 @@ import {
 interface ProductDetailViewProps {
   product: Product;
   onBackToMenu: () => void;
+  onBackToHome?: () => void;
   onSelectProduct: (product: Product) => void;
   onAddToCart: (item: CartItem) => void;
   onOpenQuickDelivery: () => void;
@@ -48,6 +49,7 @@ interface ProductDetailViewProps {
 export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   product,
   onBackToMenu,
+  onBackToHome,
   onSelectProduct,
   onAddToCart,
   onOpenQuickDelivery,
@@ -179,68 +181,8 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
 
   return (
     <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b] pb-24 font-sans selection:bg-[#fdd5b8] selection:text-[#785b44]">
-      {/* Top Breadcrumb & Navigation Bar */}
-      <div className="bg-white border-b border-stone-200/80 sticky top-16 sm:top-20 z-30 shadow-2xs backdrop-blur-md bg-white/95">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={onBackToMenu}
-            className="inline-flex items-center gap-2 text-stone-600 hover:text-amber-900 font-semibold text-xs sm:text-sm transition-colors cursor-pointer group"
-          >
-            <div className="w-7 h-7 rounded-full bg-stone-100 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
-              <ArrowLeft className="w-4 h-4 text-stone-700 group-hover:text-amber-900" />
-            </div>
-            <span>Quay lại Thực đơn</span>
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 text-xs text-stone-400">
-            <span className="hover:text-stone-700 cursor-pointer" onClick={onBackToMenu}>
-              Trang chủ
-            </span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="hover:text-stone-700 cursor-pointer" onClick={onBackToMenu}>
-              Thực đơn
-            </span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-amber-900 font-semibold">{product.categoryLabel}</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-stone-800 font-bold truncate max-w-[200px]">
-              {product.name}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Tooltip title="Yêu thích">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLiked(!isLiked);
-                  message.info(isLiked ? 'Đã bỏ yêu thích' : 'Đã lưu vào danh sách yêu thích!');
-                }}
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
-                  isLiked
-                    ? 'bg-rose-50 border-rose-200 text-rose-600'
-                    : 'bg-stone-50 border-stone-200 text-stone-500 hover:text-rose-600'
-                }`}
-              >
-                <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Chia sẻ sản phẩm">
-              <button
-                type="button"
-                onClick={handleShare}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-600 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
-            </Tooltip>
-          </div>
-        </div>
-      </div>
-
       {/* Main Product Stage */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
+      <div className="lumina-container pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Left Column: Visual Gallery & Badges (5 cols) */}

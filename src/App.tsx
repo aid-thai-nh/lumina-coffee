@@ -23,7 +23,9 @@ import { AboutView } from './views/AboutView';
 import { LocationsView } from './views/LocationsView';
 import { ProductDetailView } from './views/ProductDetailView';
 import { SystemDesignView } from './views/SystemDesignView';
-import { CheckCircle2, X, Coffee, Sparkles, Layers, Bike } from 'lucide-react';
+import { BreadcrumbBar, BreadcrumbItem } from './components/BreadcrumbBar';
+import { Tooltip } from 'antd';
+import { CheckCircle2, X, Coffee, Sparkles, Layers, Bike, Heart, Share2 } from 'lucide-react';
 
 function AppContent() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -117,6 +119,129 @@ function AppContent() {
 
   const showToast = (msg: string) => {
     toast.success(msg, { title: 'Thông báo giỏ hàng' });
+  };
+
+  // Menu Category Filter State (synchronized with Breadcrumbs)
+  const [menuSelectedCategory, setMenuSelectedCategory] = useState<string>('all');
+  const [likedProductIds, setLikedProductIds] = useState<Record<string, boolean>>({});
+
+  const isCurrentProductLiked = selectedProduct ? !!likedProductIds[selectedProduct.id] : false;
+  const toggleCurrentProductLike = () => {
+    if (!selectedProduct) return;
+    const next = !isCurrentProductLiked;
+    setLikedProductIds((prev) => ({ ...prev, [selectedProduct.id]: next }));
+    message.info(next ? 'Đã lưu vào danh sách yêu thích!' : 'Đã bỏ yêu thích');
+  };
+
+  const handleShareCurrentProduct = async () => {
+    if (!selectedProduct) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${selectedProduct.name} | Lumina Coffee`,
+          text: selectedProduct.description,
+          url: window.location.href,
+        });
+        return;
+      } catch {
+        // user cancelled or share failed
+      }
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(window.location.href);
+      message.success('Đã sao chép liên kết sản phẩm vào bộ nhớ tạm!');
+    }
+  };
+
+  const getBreadcrumbItems = (): BreadcrumbItem[] => {
+    switch (currentTab) {
+      case 'menu': {
+        const categoryLabels: Record<string, string> = {
+          'single-origin': 'Cà phê Đặc sản Specialty',
+          espresso: 'Cà phê Pha Máy Espresso',
+          'cold-brew': 'Cà phê Ủ Lạnh Cold Brew',
+          signature: 'Đồ Uống Sáng Tạo Signature',
+          gear: 'Dụng Cụ & Thiết Bị Pha',
+        };
+        const activeLabel = categoryLabels[menuSelectedCategory];
+        return [
+          { label: 'Trang chủ', onClick: () => setCurrentTab('home') },
+          {
+            label: 'Thực đơn',
+            onClick: menuSelectedCategory !== 'all' ? () => setMenuSelectedCategory('all') : undefined,
+            active: menuSelectedCategory === 'all',
+          },
+          ...(menuSelectedCategory !== 'all' && activeLabel
+            ? [{ label: activeLabel, active: true }]
+            : []),
+        ];
+      }
+      case 'about':
+        return [
+          { label: 'Trang chủ', onClick: () => setCurrentTab('home') },
+          { label: 'Câu chuyện thương hiệu', active: true },
+        ];
+      case 'locations':
+        return [
+          { label: 'Trang chủ', onClick: () => setCurrentTab('home') },
+          { label: 'Không gian & Chi nhánh', active: true },
+        ];
+      case 'product-detail':
+        return [
+          { label: 'Trang chủ', onClick: () => setCurrentTab('home') },
+          { label: 'Thực đơn', onClick: () => setCurrentTab('menu') },
+          {
+            label: selectedProduct?.categoryLabel || 'Cà phê Đặc sản',
+            onClick: () => {
+              if (selectedProduct?.category) {
+                setMenuSelectedCategory(selectedProduct.category);
+              }
+              setCurrentTab('menu');
+            },
+          },
+          { label: selectedProduct?.name || 'Chi tiết sản phẩm', active: true },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const getBreadcrumbRightAction = () => {
+    if (currentTab === 'product-detail' && selectedProduct) {
+      return (
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Tooltip title="Yêu thích">
+            <button
+              type="button"
+              onClick={toggleCurrentProductLike}
+              className={`w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+                isCurrentProductLiked
+                  ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-xs'
+                  : 'bg-white border-[#e8dfd1] text-stone-500 hover:text-rose-600 hover:border-rose-200'
+              }`}
+              aria-label="Thêm vào yêu thích"
+            >
+              <Heart
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
+                  isCurrentProductLiked ? 'fill-rose-500 text-rose-500' : ''
+                }`}
+              />
+            </button>
+          </Tooltip>
+          <Tooltip title="Chia sẻ sản phẩm">
+            <button
+              type="button"
+              onClick={handleShareCurrentProduct}
+              className="w-7.5 h-7.5 sm:w-8.5 sm:h-8.5 rounded-full border border-[#e8dfd1] bg-white hover:bg-[#f9f6f0] text-stone-600 flex items-center justify-center transition-colors cursor-pointer"
+              aria-label="Chia sẻ sản phẩm"
+            >
+              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+          </Tooltip>
+        </div>
+      );
+    }
+    return null;
   };
 
   const handleOpenProduct = (product: Product) => {
@@ -228,7 +353,10 @@ function AppContent() {
           {/* Top Header */}
           <Header
             currentTab={currentTab}
-            onSelectTab={setCurrentTab}
+            onSelectTab={(tab) => {
+              setCurrentTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             cartCount={totalCartCount}
             onOpenCart={() => setIsCartOpen(true)}
             onOpenQuickDelivery={() => setIsQuickDeliveryOpen(true)}
@@ -237,8 +365,20 @@ function AppContent() {
             onOpenProfile={() => setIsProfileOpen(true)}
           />
 
+          {/* Global Breadcrumb for all non-Home pages with Smart Headroom */}
+          {currentTab !== 'home' && (
+            <BreadcrumbBar
+              items={getBreadcrumbItems()}
+              rightAction={getBreadcrumbRightAction()}
+            />
+          )}
+
           {/* Main Content Router */}
-          <main className="w-full pt-16 sm:pt-20 flex-1">
+          <main
+            className={`w-full flex-1 transition-[padding] duration-300 ${
+              currentTab === 'home' ? 'pt-16 sm:pt-20' : 'pt-[108px] sm:pt-[132px]'
+            }`}
+          >
             <AnimatePresence mode="wait">
               {currentTab === 'home' && (
                 <motion.div
@@ -269,6 +409,9 @@ function AppContent() {
                   <MenuView
                     onOpenProductModal={handleOpenProduct}
                     onQuickAddToCart={handleQuickAdd}
+                    onBackToHome={() => setCurrentTab('home')}
+                    selectedCategory={menuSelectedCategory}
+                    onSelectCategory={setMenuSelectedCategory}
                   />
                 </motion.div>
               )}
@@ -284,6 +427,7 @@ function AppContent() {
                   <ProductDetailView
                     product={selectedProduct ?? PRODUCTS[0]}
                     onBackToMenu={() => setCurrentTab('menu')}
+                    onBackToHome={() => setCurrentTab('home')}
                     onSelectProduct={handleOpenProduct}
                     onAddToCart={handleAddToCart}
                     onOpenQuickDelivery={() => setIsQuickDeliveryOpen(true)}
@@ -317,6 +461,7 @@ function AppContent() {
                 >
                   <LocationsView
                     onOpenWorkshopModal={() => setIsWorkshopOpen(true)}
+                    onBackToHome={() => setCurrentTab('home')}
                   />
                 </motion.div>
               )}

@@ -26,9 +26,10 @@ import {
 
 interface LocationsViewProps {
   onOpenWorkshopModal: () => void;
+  onBackToHome?: () => void;
 }
 
-export const LocationsView: React.FC<LocationsViewProps> = ({ onOpenWorkshopModal }) => {
+export const LocationsView: React.FC<LocationsViewProps> = ({ onOpenWorkshopModal, onBackToHome }) => {
   // Filter states
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -135,9 +136,9 @@ export const LocationsView: React.FC<LocationsViewProps> = ({ onOpenWorkshopModa
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full bg-[#fcf9f8] min-h-screen py-12 lg:py-16 overflow-hidden"
+      className="w-full bg-[#fcf9f8] min-h-screen pb-16 overflow-x-clip"
     >
-      <div className="lumina-container">
+      <div className="lumina-container pt-6 sm:pt-10">
         {/* Header with Editorial Typography */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
